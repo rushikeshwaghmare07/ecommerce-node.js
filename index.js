@@ -22,3 +22,7 @@ const PORT = process.env.PORT || 8000;
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
+
+// route and routes imports
+const userRoute = require("./routes/user.route.js");
+app.use("/api/v1/user", userRoute);
