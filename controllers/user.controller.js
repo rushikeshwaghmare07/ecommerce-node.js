@@ -4,8 +4,16 @@ const registerController = async (req, res) => {
     try {
         const { name, email, password, address, city, country,  phone} = req.body
         if (!name || !email || !password || !address || !city || !country || !phone) {
-            return res.status(500).send({ success: false, message: "Please Provide All Fields" });
+            return res.status(400).json({ success: false, message: "Please provide all fields" });
         }
+
+        // Check if user already exists
+        const existingUser = await User.findOne({email})
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already taken !!"});
+        }
+
+        // Create new user
         const user = await User.create({
             name,
             email,
@@ -15,10 +23,11 @@ const registerController = async (req, res) => {
             country,
             phone
         });
-        res.status(201).send({ success: true, message: "Registration Success, Please login" });
+
+        return res.status(201).json({ success: true, message: "Registration successful. Please log in." });
     } catch (error) {
         console.log("Error: ", error);
-        res.status(500).send({ success: false, message: "Internal Server Error"});
+        res.status(500).json({ success: false, message: "Internal Server Error"});
     }
 }
 
