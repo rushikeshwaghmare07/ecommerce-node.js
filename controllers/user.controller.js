@@ -31,6 +31,31 @@ const registerController = async (req, res) => {
     }
 }
 
+const loginController = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: "Please provide email and password." });
+        }
+        // check user
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User Not Found." });
+        }
+        // check password
+        const isMatch = await user.comparePassword(password)
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid credential" });
+        }
+
+        res.status(200).json({ success: true, message: "Login successful." });
+    } catch (error) {
+        console.log("Error in loginController: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error"});
+    }
+}
+
 module.exports = {
-    registerController
+    registerController,
+    loginController
 }
