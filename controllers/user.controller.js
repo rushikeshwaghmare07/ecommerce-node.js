@@ -59,11 +59,26 @@ const loginController = async (req, res) => {
         .status(200).json({ success: true, message: "Login successful.", token});
     } catch (error) {
         console.error("Error in loginController: ", error);
-        res.status(500).json({ success: false, message: "Internal Server Error"});
+        res.status(500).json({ success: false, message: "Internal Server Error."});
     }
-}
+};
+
+const getUserProfileController = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select("-password");
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+        res.status(200).json({ success: true, message: "User profile fetched successfully.", user });
+    } catch (error) {
+        console.error("Error in profile controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 
 module.exports = {
     registerController,
-    loginController
+    loginController,
+    getUserProfileController,
 }
