@@ -50,9 +50,15 @@ const loginController = async (req, res) => {
 
         // token
         const token = user.generateToken();
-        res.status(200).json({ success: true, message: "Login successful.", token});
+        res.cookie("token", token, {
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            secure: process.env.NODE_ENV === "development" ? true : false,
+            httpOnly: process.env.NODE_ENV === "development" ? true : false,
+            sameSite: process.env.NODE_ENV === "development" ? true : false
+        })
+        .status(200).json({ success: true, message: "Login successful.", token});
     } catch (error) {
-        console.log("Error in loginController: ", error);
+        console.error("Error in loginController: ", error);
         res.status(500).json({ success: false, message: "Internal Server Error"});
     }
 }
