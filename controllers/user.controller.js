@@ -76,9 +76,19 @@ const getUserProfileController = async (req, res) => {
     }
 };
 
+const logoutController = async (req, res) => {
+    try {
+        res.clearCookie("token").status(200).json({ success: true, message: "Logout successfully."});
+    } catch (error) {
+        console.error("Error in logout controller:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
 
 module.exports = {
     registerController,
     loginController,
     getUserProfileController,
+    logoutController,
 }
