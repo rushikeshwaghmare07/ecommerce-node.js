@@ -94,7 +94,7 @@ const updateProfileController = async (req, res) => {
             new: true,
             runValidators: true
         });
-        
+
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found."});
         }
@@ -106,6 +106,28 @@ const updateProfileController = async (req, res) => {
     }
 };
 
+const updateUserPassword = async (req, res) => {
+    try {
+        const {oldPassword, newPassword} = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ success: false, message: "Please provide both old and new passwords." });
+        }
+
+        const user = await User.findById(req.user._id)
+        const isMatch = await user.comparePassword(oldPassword)
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Incorrect old password" });
+        }
+
+        user.password = newPassword
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error in update password controller:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" }); 
+    }
+};
 
 module.exports = {
     registerController,
@@ -113,4 +135,5 @@ module.exports = {
     getUserProfileController,
     logoutController,
     updateProfileController,
+    updateUserPassword,
 }
