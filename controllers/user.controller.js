@@ -85,10 +85,32 @@ const logoutController = async (req, res) => {
     }
 };
 
+const updateProfileController = async (req, res) => {
+    try {
+        const { name, email, address, city, country, phone } = req.body;
+        const updateDate = { name, email, address, city, country, phone }
+
+        const user = await User.findByIdAndUpdate(req.user._id, updateDate, {
+            new: true,
+            runValidators: true
+        });
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found."});
+        }
+
+        res.status(200).json({ success: true, message: "User profile updated.", user });
+    } catch (error) {
+        console.error("Error in update profile controller:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
 
 module.exports = {
     registerController,
     loginController,
     getUserProfileController,
     logoutController,
+    updateProfileController,
 }
