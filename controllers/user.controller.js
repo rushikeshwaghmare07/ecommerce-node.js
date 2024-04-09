@@ -76,7 +76,7 @@ const loginController = async (req, res) => {
     }
 };
 
-const getUserProfileController = async (req, res) => {
+const getUserProfileByIdController = async (req, res) => {
     try {
         const user = await User.findById(req.user._id).select("-password");
         if (!user) {
@@ -177,7 +177,7 @@ const updateProfilePicController = async (req, res) => {
 module.exports = {
     registerController,
     loginController,
-    getUserProfileController,
+    getUserProfileByIdController,
     logoutController,
     updateProfileController,
     updateUserPassword,
