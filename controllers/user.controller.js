@@ -1,5 +1,4 @@
 const User = require("../models/user.model.js");
-const { getDataUri } = require("../utils/features.js");
 const upload = require("../config/multer.config.js");
 const cloudinary = require("../config/cloudinary.config.js");
 
