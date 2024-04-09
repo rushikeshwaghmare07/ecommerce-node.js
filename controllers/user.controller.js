@@ -1,35 +1,49 @@
 const User = require("../models/user.model.js");
+const { getDataUri } = require("../utils/features.js");
+const upload = require("../config/multer.config.js");
+const cloudinary = require("../config/cloudinary.config.js");
 
 const registerController = async (req, res) => {
-    try {
-        const { name, email, password, address, city, country,  phone} = req.body
-        if (!name || !email || !password || !address || !city || !country || !phone) {
-            return res.status(400).json({ success: false, message: "Please provide all fields" });
-        }
+  try {
+    const { name, email, password, address, city, country, phone } = req.body;
 
-        // Check if user already exists
-        const existingUser = await User.findOne({email})
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: "Email already taken !!"});
-        }
-
-        // Create new user
-        const user = await User.create({
-            name,
-            email,
-            password,
-            address,
-            city,
-            country,
-            phone
-        });
-
-        return res.status(201).json({ success: true, message: "Registration successful. Please log in." });
-    } catch (error) {
-        console.log("Error: ", error);
-        res.status(500).json({ success: false, message: "Internal Server Error"});
+    // Check if all required fields are provided
+    if (!name || !email || !password || !address || !city || !country || !phone) {
+      return res.status(400).json({ success: false, message: "Please provide all fields." });
     }
-}
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email already taken." });
+    }
+
+    // Upload profile picture to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path);
+
+    // Create new user
+    const newUser = new User({
+      name,
+      email,
+      password,
+      address,
+      city,
+      country,
+      phone,
+      profilePic: {
+        public_id: result.public_id,
+        url: result.secure_url,
+      },
+    });
+
+    await newUser.save();
+
+    return res.status(201).json({ success: true, message: "Registration successful. Please log in." });
+  } catch (error) {
+    console.error("Error in register controller:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 
 const loginController = async (req, res) => {
     try {
@@ -129,6 +143,38 @@ const updateUserPassword = async (req, res) => {
     }
 };
 
+const updateProfilePicController = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ success: false, message: "Please provide an image file." });
+        }
+
+        // Delete previous image (if exists)
+        if (user.profilePic && user.profilePic.public_id) {
+            await cloudinary.uploader.destroy(user.profilePic.public_id);
+        }
+
+        // Upload new image
+        const uploadResult = await cloudinary.uploader.upload(file.path);
+
+        // Update user's profile picture
+        user.profilePic = {
+            public_id: uploadResult.public_id,
+            url: uploadResult.secure_url
+        };
+
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Profile picture updated successfully." });
+    } catch (error) {
+        console.error("Error in update profile picture controller:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" }); 
+    }
+};
+
 module.exports = {
     registerController,
     loginController,
@@ -136,4 +182,5 @@ module.exports = {
     logoutController,
     updateProfileController,
     updateUserPassword,
+    updateProfilePicController,
 }
