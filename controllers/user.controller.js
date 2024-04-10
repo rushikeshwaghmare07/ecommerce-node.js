@@ -100,9 +100,9 @@ const logoutController = async (req, res) => {
 const updateProfileController = async (req, res) => {
     try {
         const { name, email, address, city, country, phone } = req.body;
-        const updateDate = { name, email, address, city, country, phone }
+        const updateData = { name, email, address, city, country, phone }
 
-        const user = await User.findByIdAndUpdate(req.user._id, updateDate, {
+        const user = await User.findByIdAndUpdate(req.user._id, updateData, {
             new: true,
             runValidators: true
         });
