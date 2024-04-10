@@ -1,6 +1,5 @@
 const User = require("../models/user.model.js");
-const upload = require("../config/multer.config.js");
-const cloudinary = require("../config/cloudinary.config.js");
+const cloudinary = require("../utils/cloudinary.js");
 
 const registerController = async (req, res) => {
   try {

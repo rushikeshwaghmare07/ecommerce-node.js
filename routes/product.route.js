@@ -1,11 +1,12 @@
 const express = require("express");
-const { getAllProductController, getProductByIdController } = require("../controllers/product.controller");
+const { getAllProductController, getProductByIdController, createProductController } = require("../controllers/product.controller");
+const { isAuthenticate } = require("../middlewares/authMiddleware.js");
+const { upload } = require("../middlewares/multer.middleware.js");
 
 const router = express.Router();
 
-// GET All Products
 router.get("/get-all", getAllProductController);
-// GET Product by Id
 router.get("/:id", getProductByIdController);
+router.post("/create", isAuthenticate, upload.single("images"), createProductController);
 
 module.exports = router;
