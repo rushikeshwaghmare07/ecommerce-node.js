@@ -112,6 +112,9 @@ const updateImageController = async (req, res) => {
 
     } catch (error) {
         console.error("Error in update product image controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID format." });
+        };
         res.status(500).json({ success: false, message: "Internal Server Error." });
     }
 };
