@@ -20,7 +20,7 @@ const getProductByIdController = async (req, res) => {
         res.status(200).json({ success: true, message: "Product fetched successfully.", product});
     } catch (error) {
         console.error("Error in get single product controller: ", error);
-        if (error instanceof CastError) {
+        if (error === "CastError") {
             return res.status(500).json({ success: false, message: "Invalid ID" });
         }
         res.status(500).json({ success: false, message: "Internal Server Error" });
