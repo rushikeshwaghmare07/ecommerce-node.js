@@ -97,6 +97,7 @@ const updateImageController = async (req, res) => {
             });
         
             await Promise.all(deletePromises);
+            product.images = [];
         }        
 
         const updatedImage = await cloudinary.uploader.upload(file.path);
