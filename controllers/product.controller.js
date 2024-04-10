@@ -89,15 +89,6 @@ const updateImageController = async (req, res) => {
 
         if (!file) {
             return res.status(400).json({ success: false, message: "Please provide an image file." });
-        }
-
-        if (product.images && product.images.length > 0) {
-            const deletePromises = product.images.map(async (image) => {
-                await cloudinary.uploader.destroy(image.public_id);
-            });
-        
-            await Promise.all(deletePromises);
-            product.images = [];
         }        
 
         const updatedImage = await cloudinary.uploader.upload(file.path);
