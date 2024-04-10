@@ -21,7 +21,7 @@ const getProductByIdController = async (req, res) => {
     } catch (error) {
         console.error("Error in get single product controller: ", error);
         if (error instanceof CastError) {
-        return res.status(500).json({ success: false, message: "Invalid ID" });
+            return res.status(500).json({ success: false, message: "Invalid ID" });
         }
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
@@ -58,8 +58,33 @@ const createProductController = async (req, res) => {
     }
 };
 
+const updateProductController = async (req, res) => {
+    try {
+        const { name, description, price, stock, category } = req.body;
+        const updatedProduct = { name, description, price, stock, category };
+
+        const product = await Product.findByIdAndUpdate(req.params.id, updatedProduct, {
+            new: true,
+            runValidators: true
+        });
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product Not Found!!"});
+        }
+
+        res.status(201).json({ success: true, message: "Product updated successfully.", product });
+    } catch (error) {
+        console.error("Error in update product controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID format." });
+        };
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     getAllProductController,
     getProductByIdController,
-    createProductController
+    createProductController,
+    updateProductController,
 }
