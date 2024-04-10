@@ -1,3 +1,4 @@
+const { json } = require("express");
 const Product = require("../models/product.model.js");
 const cloudinary = require("../utils/cloudinary.js");
 
@@ -110,10 +111,48 @@ const updateImageController = async (req, res) => {
     }
 };
 
+const deleteProductImageController = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product Not Found !!" });
+        }
+
+        // find the index of the image to delete
+        const imageId = req.query.id;
+        if (!imageId) { 
+            return res.status(404).json({ success: false, message: "Product image ID not provided !!" });
+        }
+
+        const index = product.images.findIndex(item => item._id.toString() === imageId.toString());
+        if (index === -1) { 
+            return res.status(404).json({ success: false, message: "Image Not Found !!" });
+        }
+
+        // delete product image from cloudinary
+        await cloudinary.uploader.destroy(product.images[index].public_id);
+
+        // remove the image from the product's image array
+        product.images.splice(index, 1);
+
+        // save the updated product
+        await product.save();
+
+        res.status(200).json({ success: true, message: "Product image deleted successfully." });
+    } catch (error) {
+        console.error("Error in delete product image controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID format." });
+        };
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     getAllProductController,
     getProductByIdController,
     createProductController,
     updateProductController,
     updateImageController,
+    deleteProductImageController,
 }
