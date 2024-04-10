@@ -148,6 +148,31 @@ const deleteProductImageController = async (req, res) => {
     }
 };
 
+const deleteProductController = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product Not Found !!" });
+        }
+
+        // deleting all the images of the product from cloudinary
+        for (const image of product.images) {
+            await cloudinary.uploader.destroy(image.public_id);
+        }
+
+        // delete the product from the database
+        await Product.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({ success: true, message: "Product deleted successfully." });
+    } catch (error) {
+        console.error("Error in delete product controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID format." });
+        };
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     getAllProductController,
     getProductByIdController,
@@ -155,4 +180,5 @@ module.exports = {
     updateProductController,
     updateImageController,
     deleteProductImageController,
+    deleteProductController
 }
