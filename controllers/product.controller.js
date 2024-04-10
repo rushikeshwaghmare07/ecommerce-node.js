@@ -82,9 +82,43 @@ const updateProductController = async (req, res) => {
     }
 };
 
+const updateImageController = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).json({ success: false, message: "Please provide an image file." });
+        }
+
+        if (product.images && product.images.length > 0) {
+            const deletePromises = product.images.map(async (image) => {
+                await cloudinary.uploader.destroy(image.public_id);
+            });
+        
+            await Promise.all(deletePromises);
+        }        
+
+        const updatedImage = await cloudinary.uploader.upload(file.path);
+
+        product.images.push({
+            public_id: updatedImage.public_id,
+            url: updatedImage.secure_url
+        });
+
+        await product.save();
+        res.status(200).json({ success: true, message: "Product image updated successfully." });
+
+    } catch (error) {
+        console.error("Error in update product image controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     getAllProductController,
     getProductByIdController,
     createProductController,
     updateProductController,
+    updateImageController,
 }
