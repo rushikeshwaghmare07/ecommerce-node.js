@@ -28,6 +28,8 @@ app.use(cookieParser());
 // route and routes imports
 const userRoute = require("./routes/user.route.js");
 const productRoute = require("./routes/product.route.js");
+const categoryRoute = require("./routes/category.route.js");
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);
+app.use("/api/v1/category", categoryRoute);
