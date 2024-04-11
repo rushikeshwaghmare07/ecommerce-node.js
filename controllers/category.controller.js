@@ -17,6 +17,19 @@ const createCategoryController = async (req, res) => {
     }
 };
 
+const getAllCategoryController = async (req, res) => {
+    try {
+        const categories = await Category.find({});
+        const categoryCount = await Category.countDocuments();
+
+        res.status(200).json({ success: true, message: "Categories fetched successfully.", count: categoryCount, categories, });
+    } catch (error) {
+        console.error("Error in get all category controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
 module.exports = {
-    createCategoryController
+    createCategoryController,
+    getAllCategoryController
 }
