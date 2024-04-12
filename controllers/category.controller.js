@@ -53,8 +53,33 @@ const deleteCategoryController = async (req, res) => {
     }
 };
 
+const updateCategoryController = async (req, res) => {
+    try {
+        const categoryId = req.params.id;
+        const { category } = req.body;
+        
+        const existingCategory = await Category.findById(categoryId);
+        if (!existingCategory) {
+            return res.status(404).json({ success: false, message: "Category Not Found." });
+        }
+
+        // update category
+        existingCategory.category = category;
+        await existingCategory.save();
+
+        res.status(200).json({ success: true, message: "Category Updated Successfully.", category: existingCategory });
+    } catch (error) {
+        console.error("Error in update category controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID formate." });
+        }
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
 module.exports = {
     createCategoryController,
     getAllCategoryController,
-    deleteCategoryController
+    deleteCategoryController,
+    updateCategoryController
 }
