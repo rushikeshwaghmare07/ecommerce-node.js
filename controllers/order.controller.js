@@ -1,3 +1,4 @@
+const { stripe } = require("../index.js");
 const Order = require("../models/order.model.js");
 const Product = require("../models/product.model.js");
 
@@ -65,8 +66,28 @@ const singleOrderDetailController = async (req, res) => {
     }
 };
 
+const paymentController = async (req, res) => {
+    try {
+        const { totalAmount } = req.body;
+        if (!totalAmount) {
+            return res.status(400).json({ success: false, message: "Total amount is required." });
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: Number(totalAmount * 100),
+            currency: "inr"
+        });
+
+        res.status(200).json({ success: true, client_secret: paymentIntent.client_secret });
+    } catch (error) {
+        console.error("Error in payment controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     createOrderController,
     getMyOrderController,
-    singleOrderDetailController
+    singleOrderDetailController,
+    paymentController
 }

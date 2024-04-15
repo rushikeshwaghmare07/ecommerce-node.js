@@ -4,6 +4,11 @@ const cors = require("cors");
 require("dotenv").config();
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
+const Stripe = require("stripe");
+
+// stripe configuration
+const stripe = new Stripe(process.env.STRIPE_API_SECRET);
+module.exports = { stripe };
 
 const app = express();
 const PORT = process.env.PORT || 8000;
