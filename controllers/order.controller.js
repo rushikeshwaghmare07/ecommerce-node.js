@@ -48,7 +48,25 @@ const getMyOrderController = async (req, res) => {
     }
 };
 
+const singleOrderDetailController = async (req, res) => {
+    try {
+        const orders = await Order.findById(req.params.id);
+        if (!orders) {
+            return res.status(404).json({ success: false, message: "No order found." });
+        }
+
+        res.status(200).json({ success: true, message: "Your order fetch.", orders });
+    } catch (error) {
+        console.error("Error in single order controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "invalid order ID format" });
+        }
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     createOrderController,
-    getMyOrderController
+    getMyOrderController,
+    singleOrderDetailController
 }
