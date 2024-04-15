@@ -34,6 +34,21 @@ const createOrderController = async (req, res) => {
     }
 };
 
+const getMyOrderController = async (req, res) => {
+    try {
+        const orders = await Order.find({ user: req.user._id });
+        if (!orders) {
+            return res.status(404).json({ success: false, message: "No order found." });
+        }
+
+        res.status(200).json({ success: true, message: "Your order date.", totalOrders: orders.length, orders });
+    } catch (error) {
+        console.error("Error in my order controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
-    createOrderController
+    createOrderController,
+    getMyOrderController
 }
