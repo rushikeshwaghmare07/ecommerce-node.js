@@ -5,7 +5,10 @@ require("dotenv").config();
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 
-//database connection
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// database connection
 connectDB()
     .then(() => {
         app.listen(PORT, () => {
@@ -16,16 +19,13 @@ connectDB()
         console.log("MONGO DB connection failed !! ", err);
     });
 
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-// middlewares
+// middlewares setup
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 
-// route and routes imports
+// import and use routes
 const userRoute = require("./routes/user.route.js");
 const productRoute = require("./routes/product.route.js");
 const categoryRoute = require("./routes/category.route.js");
