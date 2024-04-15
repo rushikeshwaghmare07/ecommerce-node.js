@@ -1,6 +1,6 @@
-const { json } = require("express");
 const Product = require("../models/product.model.js");
 const cloudinary = require("../utils/cloudinary.js");
+const Category = require("../models/category.model.js");
 
 const getAllProductController = async (req, res) => {
     try {
@@ -30,10 +30,15 @@ const getProductByIdController = async (req, res) => {
 
 const createProductController = async (req, res) => {
     try {
-        const { name, description, price, stock, category } = req.body;
-        if (!name || !description || !price || !stock) {
+        const { name, description, price, stock, quantity } = req.body;
+        if (!name || !description || !price || !stock || !quantity) {
             return res.status(400).json({ success: false, message: "Please provide all fields." });
         }
+
+        const category = await Category.findById(req.body.category);
+        if(!category) return res.status(400).send('Invalid Category')
+    
+
 
         const result = await cloudinary.uploader.upload(req.file.path);
 
@@ -43,6 +48,7 @@ const createProductController = async (req, res) => {
             price,
             category,
             stock,
+            quantity,
             images: [
                 {
                     public_id: result.public_id,
