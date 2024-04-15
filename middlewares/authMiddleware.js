@@ -1,6 +1,7 @@
 const JWT = require("jsonwebtoken");
 const User = require("../models/user.model");
 
+// user auth
 const isAuthenticate = async (req, res, next) => {
     try {
         const { token } = req.cookies;
@@ -18,8 +19,18 @@ const isAuthenticate = async (req, res, next) => {
         console.error("Error in authentication middleware:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-}
+};
+
+// admin auth
+const isAdmin = async (req, res, next) => {
+    if (req.user.role !== "admin") {
+        return res.status(401).json({ success: false, message: "Admin only" });
+    };
+
+    next();
+};
 
 module.exports = {
-    isAuthenticate
+    isAuthenticate,
+    isAdmin
 }

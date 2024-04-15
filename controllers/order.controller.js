@@ -85,9 +85,21 @@ const paymentController = async (req, res) => {
     }
 };
 
+// admin section
+const getAllOrderController = async (req, res) => {
+    try {
+        const orders = await Order.find({});
+        res.status(200).send({ success: true, message: "All Orders Data", totalOrders: orders.length, orders });
+    } catch (error) {
+        console.error("Error in get all order controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     createOrderController,
     getMyOrderController,
     singleOrderDetailController,
-    paymentController
+    paymentController,
+    getAllOrderController
 }
