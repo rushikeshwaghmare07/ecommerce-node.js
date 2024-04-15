@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 connectDB()
     .then(() => {
         app.listen(PORT, () => {
-            console.log(`Server is running at port : ${PORT} on ${process.env.NODE_ENV} mode`);
+            console.log(`Server is running at port : ${PORT} on ${process.env.MODE_ENV} mode`);
         });
     })
     .catch((err) => {
@@ -29,7 +29,9 @@ app.use(cookieParser());
 const userRoute = require("./routes/user.route.js");
 const productRoute = require("./routes/product.route.js");
 const categoryRoute = require("./routes/category.route.js");
+const orderRoute = require("./routes/order.route.js");
 
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/category", categoryRoute);
+app.use("/api/v1/order", orderRoute);
