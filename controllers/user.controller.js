@@ -3,10 +3,10 @@ const cloudinary = require("../utils/cloudinary.js");
 
 const registerController = async (req, res) => {
   try {
-    const { name, email, password, address, city, country, phone } = req.body;
+    const { name, email, password, address, city, country, phone, securityAnswer } = req.body;
 
     // Check if all required fields are provided
-    if (!name || !email || !password || !address || !city || !country || !phone) {
+    if (!name || !email || !password || !address || !city || !country || !phone || !securityAnswer) {
       return res.status(400).json({ success: false, message: "Please provide all fields." });
     }
 
@@ -28,6 +28,7 @@ const registerController = async (req, res) => {
       city,
       country,
       phone,
+      securityAnswer,
       profilePic: {
         public_id: result.public_id,
         url: result.secure_url,
@@ -173,6 +174,29 @@ const updateProfilePicController = async (req, res) => {
     }
 };
 
+// forgot password
+const passwordResetController = async (req, res) => {
+    try {
+        const { email, newPassword, securityAnswer } = req.body;
+        if (!email || !newPassword || !securityAnswer) {
+            return res.status(400).json({ success: false, message: "Please provide all fields." });
+        }
+
+        const user = await User.findOne({ email, securityAnswer });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Invalid email or security answer" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Your password has been reset successfully. Please login.", });
+    } catch (error) {
+        console.error("Error in password reset controller:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" }); 
+    }
+};
+
 module.exports = {
     registerController,
     loginController,
@@ -181,4 +205,5 @@ module.exports = {
     updateProfileController,
     updateUserPassword,
     updateProfilePicController,
+    passwordResetController
 }

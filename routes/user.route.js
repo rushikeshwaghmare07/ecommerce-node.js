@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerController, loginController, getUserProfileByIdController, logoutController, updateProfileController, updateUserPassword, updateProfilePicController } = require("../controllers/user.controller.js");
+const { registerController, loginController, getUserProfileByIdController, logoutController, updateProfileController, updateUserPassword, updateProfilePicController, passwordResetController } = require("../controllers/user.controller.js");
 const { isAuthenticate } = require("../middlewares/authMiddleware.js");
 const { upload } = require("../middlewares/multer.middleware.js");
 
@@ -12,5 +12,7 @@ router.get("/logout", isAuthenticate, logoutController);
 router.put("/profile-update", isAuthenticate, updateProfileController);
 router.put("/update-password", isAuthenticate, updateUserPassword);
 router.put('/update-profile-pic', isAuthenticate, upload.single('profilePic'), updateProfilePicController);
+// forgot password
+router.post("/reset-password", passwordResetController);
 
 module.exports = router;
