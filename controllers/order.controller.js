@@ -96,10 +96,40 @@ const getAllOrderController = async (req, res) => {
     }
 };
 
+const changeOrderStatusController = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "No order found." });
+        }
+
+        if (order.orderStatus === "processing") {
+            order.orderStatus = "shipped";
+        } else if (order.orderStatus === "shipped") {
+            order.orderStatus = "delivered" 
+            order.deliveredAt = Date.now()
+        } else {
+            return res.status(500).send({ success: false, message: "Order already delivered." });
+        }
+
+        await order.save();
+
+        res.status(200).send({ success: true, message: "Order status updated." });   
+
+    } catch (error) {
+        console.error("Error in change order controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid order ID format" });
+        }
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     createOrderController,
     getMyOrderController,
     singleOrderDetailController,
     paymentController,
-    getAllOrderController
+    getAllOrderController,
+    changeOrderStatusController
 }

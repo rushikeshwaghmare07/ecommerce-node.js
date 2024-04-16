@@ -1,6 +1,6 @@
 const express = require("express");
 const { isAuthenticate, isAdmin } = require("../middlewares/authMiddleware.js");
-const  { createOrderController, getMyOrderController, singleOrderDetailController, paymentController, getAllOrderController } = require("../controllers/order.controller.js");
+const  { createOrderController, getMyOrderController, singleOrderDetailController, paymentController, getAllOrderController, changeOrderStatusController } = require("../controllers/order.controller.js");
 const router = express.Router();
 
 router.post("/create", isAuthenticate, createOrderController);
@@ -11,5 +11,8 @@ router.post("/payments", isAuthenticate, paymentController);
 
 // admin part
 router.get("/admin/get-all-orders", isAuthenticate, isAdmin, getAllOrderController);
+
+// change order status
+router.put("/admin/order/:id", isAuthenticate, isAdmin, changeOrderStatusController);
 
 module.exports = router;
