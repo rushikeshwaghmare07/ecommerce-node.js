@@ -4,13 +4,31 @@ const Category = require("../models/category.model.js");
 
 const getAllProductController = async (req, res) => {
     try {
-        const product = await Product.find({})
-        res.status(200).json({ success: true, message: "All products fetched successfully.", product });
+        const { keyword, category } = req.query;
+
+        const product = await Product.find({
+            name: {
+                $regex: keyword ? keyword: "",
+                $options: "i",
+            },
+        });
+
+        res.status(200).json({ success: true, message: "All products fetched successfully.", totalProduct: product.length, product });
     } catch (error) {
         console.error("Error in get all product controller: ", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
     }
 };
+
+const getTopProductController = async (req, res) => {
+    try {
+        const products = await Product.find({}).sort({ rating: -1 }).limit(3)
+        res.status(200).json({ success: true, message: "Top 3 products.", products });
+    } catch (error) {
+        console.error("Error in get top product controller: ", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
 
 const getProductByIdController = async (req, res) => {
     try {
@@ -37,8 +55,6 @@ const createProductController = async (req, res) => {
 
         const category = await Category.findById(req.body.category);
         if(!category) return res.status(400).send('Invalid Category')
-    
-
 
         const result = await cloudinary.uploader.upload(req.file.path);
 
@@ -220,6 +236,7 @@ const productReviewController = async (req, res) => {
 
 module.exports = {
     getAllProductController,
+    getTopProductController,
     getProductByIdController,
     createProductController,
     updateProductController,
