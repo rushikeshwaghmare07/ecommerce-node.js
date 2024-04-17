@@ -179,6 +179,45 @@ const deleteProductController = async (req, res) => {
     }
 };
 
+const productReviewController = async (req, res) => {
+    try {
+        const { comment, rating } = req.body;
+
+        const product = await Product.findById(req.params.id);
+
+        // check previous review
+        const alreadyReviewed = product.reviews.some( (r) => r.user.toString() === req.user._id.toString() );
+        if (alreadyReviewed) {
+            return res.status(400).send({ success: false, message: "Product already reviewed" });
+        };
+
+         // review object
+        const review = {
+            name: req.user.name,
+            rating: Number(rating),
+            comment,
+            user: req.user._id,
+        };
+
+        // passing review object to reviews array
+        product.reviews.push(review);
+
+        // update the number of reviews and calculate the average rating
+        product.numReviews = product.reviews.length;
+        product.rating = product.reviews.reduce((total, review) => total + review.rating, 0) / product.reviews.length;
+
+        await product.save();
+
+        res.status(200).send({ success: true, message: "Review added successfully." });
+    } catch (error) {
+        console.error("Error in product review controller: ", error);
+        if (error.name === "CastError") {
+            return res.status(400).json({ success: false, message: "Invalid product ID format." });
+        };
+        res.status(500).json({ success: false, message: "Internal Server Error." });
+    }
+};
+
 module.exports = {
     getAllProductController,
     getProductByIdController,
@@ -186,5 +225,6 @@ module.exports = {
     updateProductController,
     updateImageController,
     deleteProductImageController,
-    deleteProductController
+    deleteProductController,
+    productReviewController
 }
