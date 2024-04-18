@@ -5,6 +5,8 @@ require("dotenv").config();
 const connectDB = require("./db/index.js");
 const cookieParser = require("cookie-parser");
 const Stripe = require("stripe");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
 
 // stripe configuration
 const stripe = new Stripe(process.env.STRIPE_API_SECRET);
@@ -25,6 +27,8 @@ connectDB()
     });
 
 // middlewares setup
+app.use(helmet());
+app.use(mongoSanitize());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
