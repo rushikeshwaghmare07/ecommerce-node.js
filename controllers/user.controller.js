@@ -65,9 +65,9 @@ const loginController = async (req, res) => {
         const token = user.generateToken();
         res.cookie("token", token, {
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            secure: process.env.NODE_ENV === "development" ? true : false,
-            httpOnly: process.env.NODE_ENV === "development" ? true : false,
-            sameSite: process.env.NODE_ENV === "development" ? true : false
+            secure: process.env.MODE_ENV === "development" ? true : false,
+            httpOnly: process.env.MODE_ENV === "development" ? true : false,
+            sameSite: process.env.MODE_ENV === "development" ? true : false
         })
         .status(200).json({ success: true, message: "Login successful.", token});
     } catch (error) {
