@@ -21,7 +21,7 @@ router.get("/logout", isAuthenticate, logoutController);
 router.put("/profile-update", isAuthenticate, updateProfileController);
 router.put("/update-password", isAuthenticate, updateUserPassword);
 router.put('/update-profile-pic', isAuthenticate, upload.single('profilePic'), updateProfilePicController);
-// forgot password
+// forgot password route
 router.post("/reset-password", passwordResetController);
 
 module.exports = router;
